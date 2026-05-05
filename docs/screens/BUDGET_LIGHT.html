@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리집 가계부 — 예산 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tp:rgba(40,40,55,0.88); --ts:rgba(80,80,110,0.58); --tt:rgba(120,120,150,0.38);
+    --card:rgba(255,255,255,0.52); --cb:rgba(255,255,255,0.85);
+    --blur:blur(40px) saturate(180%);
+    --shadow:0 8px 32px rgba(251,191,36,0.08),0 2px 8px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,1);
+    --r:22px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+  body { font-family:'Noto Sans KR',sans-serif; min-height:100vh; background:#fffbeb; overflow-x:hidden; }
+
+  .bg {
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(ellipse 65% 55% at 14% 18%, rgba(253,230,138,0.5)  0%, transparent 65%),
+      radial-gradient(ellipse 55% 65% at 88% 12%, rgba(196,181,253,0.4)  0%, transparent 60%),
+      radial-gradient(ellipse 50% 55% at 75% 84%, rgba(167,243,208,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 58% 46% at 14% 86%, rgba(251,207,232,0.38) 0%, transparent 65%),
+      radial-gradient(ellipse 32% 32% at 52% 48%, rgba(186,230,253,0.18) 0%, transparent 60%),
+      linear-gradient(145deg,#fffbeb 0%,#fdf2f8 30%,#f5f3ff 60%,#f0fdf4 100%);
+  }
+  .blob { position:fixed; border-radius:50%; filter:blur(65px); pointer-events:none; animation:float 16s ease-in-out infinite alternate; }
+  .b1 { width:290px;height:290px;top:-70px;left:-55px;background:rgba(251,191,36,0.3);animation-delay:0s; }
+  .b2 { width:240px;height:240px;top:5%;right:-45px;background:rgba(167,139,250,0.25);animation-delay:-5s; }
+  .b3 { width:200px;height:200px;bottom:9%;left:4%;background:rgba(134,239,172,0.25);animation-delay:-9s; }
+  .b4 { width:175px;height:175px;bottom:6%;right:3%;background:rgba(249,168,212,0.25);animation-delay:-13s; }
+  @keyframes float { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(16px,-12px) scale(1.04)} 100%{transform:translate(-8px,14px) scale(0.97)} }
+
+  .glass { background:var(--card); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); border:1px solid var(--cb); border-radius:var(--r); box-shadow:var(--shadow); }
+
+  .app { position:relative; z-index:1; max-width:420px; margin:0 auto; padding:0 0 40px; }
+
+  @keyframes up { from{opacity:0;transform:translateY(14px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+
+  /* Tabs */
+  .tabs {
+    display:flex; margin:52px 16px 14px;
+    background:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.85);
+    border-radius:14px; padding:3px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1);
+  }
+  .tab { flex:1; padding:9px; text-align:center; border-radius:11px; color:var(--ts); font-size:13px; font-weight:500; cursor:pointer; transition:all .22s cubic-bezier(.34,1.2,.64,1); }
+  .tab.on { background:rgba(255,255,255,0.9); border:1px solid rgba(255,255,255,0.95); color:var(--tp); box-shadow:0 2px 10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1); }
+
+  /* ── SETTING VIEW ── */
+  #v-setting { display:block; }
+  #v-closing  { display:none; }
+
+  .budget-hero {
+    margin:0 16px 14px; padding:26px;
+    position:relative; overflow:hidden;
+    background:rgba(255,255,255,0.58);
+    backdrop-filter:blur(40px) saturate(200%);
+    -webkit-backdrop-filter:blur(40px) saturate(200%);
+    border:1px solid rgba(255,255,255,0.9); border-radius:28px;
+    box-shadow:0 16px 48px rgba(251,191,36,0.12),0 4px 12px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,1);
+    animation:up .6s cubic-bezier(.34,1.4,.64,1) both;
+  }
+  .budget-hero::before { content:''; position:absolute; top:-50px; right:-30px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,rgba(251,191,36,0.18) 0%,transparent 70%); pointer-events:none; }
+  .budget-hero::after  { content:''; position:absolute; bottom:-30px; left:-20px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(249,168,212,0.14) 0%,transparent 70%); pointer-events:none; }
+
+  .bh-label  { color:rgba(161,128,10,0.7); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px; }
+  .bh-amount { font-size:50px; font-weight:700; color:var(--tp); letter-spacing:-2px; line-height:1; font-variant-numeric:tabular-nums; }
+  .bh-amount span { font-size:24px; font-weight:500; letter-spacing:0; margin-right:2px; opacity:0.6; }
+  .bh-sub    { color:var(--ts); font-size:13px; margin-top:7px; }
+
+  .bh-input-wrap { margin-top:18px; }
+  .bh-input-label { color:var(--ts); font-size:12px; margin-bottom:7px; }
+  .bh-input-row { display:flex; align-items:center; gap:10px; }
+  .bh-input {
+    flex:1; padding:13px 15px;
+    background:rgba(255,255,255,0.65); border:1px solid rgba(255,255,255,0.9);
+    border-radius:13px; color:var(--tp); font-size:18px; font-weight:600;
+    font-family:'Noto Sans KR',sans-serif; font-variant-numeric:tabular-nums; outline:none;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,0.04); transition:all .15s;
+  }
+  .bh-input:focus { border-color:rgba(251,191,36,0.5); box-shadow:0 0 0 3px rgba(251,191,36,0.12),inset 0 1px 3px rgba(0,0,0,0.03); }
+  .bh-save { padding:13px 18px; border-radius:13px; background:linear-gradient(135deg,rgba(245,158,11,0.85),rgba(251,191,36,0.8)); border:1px solid rgba(255,255,255,0.4); color:#fff; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; font-family:'Noto Sans KR',sans-serif; box-shadow:0 4px 16px rgba(245,158,11,0.28),inset 0 1px 0 rgba(255,255,255,0.25); transition:all .2s cubic-bezier(.34,1.4,.64,1); }
+  .bh-save:active { transform:scale(0.95); }
+
+  /* Presets */
+  .presets-wrap { margin:0 16px 14px; animation:up .5s cubic-bezier(.34,1.4,.64,1) .08s both; }
+  .presets-label { color:var(--ts); font-size:12px; padding:0 4px; margin-bottom:8px; }
+  .presets-grid { display:flex; gap:8px; }
+  .preset-btn { flex:1; padding:12px 6px; text-align:center; border-radius:var(--r); cursor:pointer; transition:all .2s cubic-bezier(.34,1.4,.64,1); }
+  .preset-btn:active { transform:scale(0.94); }
+  .preset-amount { color:var(--tp); font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .preset-label  { color:var(--tt); font-size:10px; margin-top:2px; }
+  .preset-btn.current { border-color:rgba(245,158,11,0.4) !important; background:rgba(245,158,11,0.08) !important; }
+
+  /* History */
+  .hist-section { margin:0 16px 14px; animation:up .6s cubic-bezier(.34,1.4,.64,1) .14s both; }
+  .hist-title { color:var(--tp); font-size:15px; font-weight:700; padding:0 4px; margin-bottom:10px; }
+  .week-row { display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-top:0.5px solid rgba(0,0,0,0.06); }
+  .week-row:first-child { border-top:none; }
+  .week-date { color:var(--ts); font-size:12px; margin-bottom:4px; }
+  .week-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:500; }
+  .badge-open    { background:rgba(251,191,36,0.15); color:rgba(161,128,10,0.9); }
+  .badge-surplus { background:rgba(52,211,153,0.12); color:rgba(5,150,105,0.9); }
+  .badge-deficit { background:rgba(239,68,68,0.1);  color:rgba(185,28,28,0.8); }
+  .week-spent  { color:var(--tp); font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; text-align:right; }
+  .week-budget { color:var(--ts); font-size:11px; text-align:right; margin-top:2px; font-variant-numeric:tabular-nums; }
+
+  /* ── CLOSING VIEW ── */
+  .closing-hdr { margin:0 16px 14px; padding:20px; animation:up .4s cubic-bezier(.34,1.4,.64,1) both; }
+  .closing-title { color:var(--tp); font-size:20px; font-weight:700; margin-bottom:4px; }
+  .closing-week  { color:var(--ts); font-size:13px; }
+
+  .remaining-card {
+    margin:0 16px 14px; padding:28px; text-align:center;
+    background:rgba(255,255,255,0.58);
+    backdrop-filter:blur(40px) saturate(200%);
+    -webkit-backdrop-filter:blur(40px) saturate(200%);
+    border:1px solid rgba(255,255,255,0.9); border-radius:28px;
+    box-shadow:0 16px 48px rgba(52,211,153,0.1),0 4px 12px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,1);
+    position:relative; overflow:hidden;
+    animation:up .5s cubic-bezier(.34,1.4,.64,1) .05s both;
+  }
+  .remaining-card::before { content:''; position:absolute; top:-40px; right:-30px; width:140px; height:140px; border-radius:50%; background:radial-gradient(circle,rgba(134,239,172,0.2) 0%,transparent 70%); }
+  .rem-label  { color:rgba(5,150,105,0.8); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; }
+  .rem-amount { font-size:52px; font-weight:700; color:var(--tp); letter-spacing:-2px; font-variant-numeric:tabular-nums; }
+  .rem-amount span { font-size:24px; font-weight:500; letter-spacing:0; margin-right:2px; opacity:0.6; }
+  .rem-sub { color:var(--ts); font-size:13px; margin-top:7px; }
+
+  .opts-title { color:var(--tp); font-size:15px; font-weight:700; padding:0 20px; margin-bottom:10px; animation:up .4s cubic-bezier(.34,1.4,.64,1) .1s both; }
+  .opts { margin:0 16px; display:flex; flex-direction:column; gap:10px; animation:up .5s cubic-bezier(.34,1.4,.64,1) .14s both; }
+
+  .opt-card {
+    padding:17px; display:flex; align-items:center; gap:14px;
+    cursor:pointer; border:1.5px solid rgba(255,255,255,0.7); border-radius:var(--r);
+    transition:all .2s cubic-bezier(.34,1.4,.64,1);
+  }
+  .opt-card:active { transform:scale(0.98); }
+  .opt-card.sel { border-color:rgba(99,102,241,0.35); background:rgba(139,92,246,0.06); box-shadow:0 0 20px rgba(139,92,246,0.08); }
+
+  .opt-radio { width:22px; height:22px; border-radius:50%; flex-shrink:0; border:2px solid rgba(0,0,0,0.12); display:flex; align-items:center; justify-content:center; transition:all .2s; }
+  .opt-card.sel .opt-radio { border-color:rgba(99,102,241,0.8); background:rgba(99,102,241,0.85); box-shadow:0 0 10px rgba(99,102,241,0.3); }
+  .opt-radio::after { content:''; width:8px; height:8px; border-radius:50%; background:white; opacity:0; transform:scale(0); transition:all .2s; }
+  .opt-card.sel .opt-radio::after { opacity:1; transform:scale(1); }
+
+  .opt-title  { color:var(--tp); font-size:15px; font-weight:500; }
+  .opt-desc   { color:var(--ts); font-size:12px; margin-top:3px; }
+  .opt-amount { color:var(--tp); font-size:15px; font-weight:700; font-variant-numeric:tabular-nums; flex-shrink:0; margin-left:auto; }
+
+  /* Split */
+  .split-inputs {
+    display:none; margin:10px 16px 0; padding:16px;
+    background:rgba(255,255,255,0.55); border:1px solid rgba(139,92,246,0.2);
+    border-radius:var(--r); animation:up .3s cubic-bezier(.34,1.4,.64,1) both;
+  }
+  .split-inputs.show { display:block; }
+  .split-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .split-row:last-of-type { margin-bottom:0; }
+  .split-label { color:var(--ts); font-size:13px; flex:1; }
+  .split-input { width:110px; padding:10px 12px; background:rgba(255,255,255,0.75); border:1px solid rgba(255,255,255,0.9); border-radius:12px; color:var(--tp); font-size:15px; font-weight:600; font-family:'Noto Sans KR',sans-serif; font-variant-numeric:tabular-nums; outline:none; text-align:right; box-shadow:inset 0 1px 3px rgba(0,0,0,0.04); }
+  .split-input:focus { border-color:rgba(139,92,246,0.4); }
+  .split-total { padding-top:10px; border-top:0.5px solid rgba(0,0,0,0.07); display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+  .split-total-label { color:var(--ts); font-size:12px; }
+  .split-total-val { color:var(--tp); font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .split-total-val.ok { color:rgba(5,150,105,0.9); }
+
+  /* Next week preview */
+  .nxt-preview { margin:14px 16px 0; padding:16px; animation:up .5s cubic-bezier(.34,1.4,.64,1) .22s both; }
+  .nxt-label { color:var(--ts); font-size:12px; margin-bottom:6px; }
+  .nxt-row   { display:flex; justify-content:space-between; align-items:center; }
+  .nxt-title { color:var(--tp); font-size:14px; }
+  .nxt-amount { color:var(--tp); font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .nxt-breakdown { color:var(--ts); font-size:11px; margin-top:4px; }
+
+  .confirm-btn {
+    margin:14px 16px 0; padding:15px; text-align:center;
+    background:linear-gradient(135deg,rgba(139,92,246,0.82),rgba(99,102,241,0.82));
+    border:1px solid rgba(255,255,255,0.4); border-radius:var(--r); color:#fff;
+    font-size:16px; font-weight:700; cursor:pointer;
+    box-shadow:0 8px 28px rgba(139,92,246,0.25),inset 0 1px 0 rgba(255,255,255,0.2);
+    transition:transform .2s cubic-bezier(.34,1.4,.64,1);
+    animation:up .5s cubic-bezier(.34,1.4,.64,1) .28s both;
+  }
+  .confirm-btn:active { transform:scale(0.97); }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+
+<div class="app">
+  <div class="tabs">
+    <div class="tab on" onclick="switchTab('setting',this)">예산 설정</div>
+    <div class="tab" onclick="switchTab('closing',this)">주간 마감</div>
+  </div>
+
+  <!-- SETTING -->
+  <div id="v-setting">
+    <div class="budget-hero">
+      <div class="bh-label">현재 주간 예산</div>
+      <div class="bh-amount"><span>¥</span>20,000</div>
+      <div class="bh-sub">5월 3주차 · ¥12,450 지출 · ¥7,550 잔액</div>
+      <div class="bh-input-wrap">
+        <div class="bh-input-label">다음 주부터 적용할 예산</div>
+        <div class="bh-input-row">
+          <input class="bh-input" type="number" value="20000">
+          <div class="bh-save">저장</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="presets-wrap">
+      <div class="presets-label">빠른 선택</div>
+      <div class="presets-grid">
+        <div class="preset-btn glass"><div class="preset-amount">¥15,000</div><div class="preset-label">절약형</div></div>
+        <div class="preset-btn glass current"><div class="preset-amount">¥20,000</div><div class="preset-label">현재 ✓</div></div>
+        <div class="preset-btn glass"><div class="preset-amount">¥25,000</div><div class="preset-label">여유형</div></div>
+        <div class="preset-btn glass"><div class="preset-amount">¥30,000</div><div class="preset-label">넉넉</div></div>
+      </div>
+    </div>
+
+    <div class="hist-section">
+      <div class="hist-title">최근 주간 기록</div>
+      <div class="glass">
+        <div class="week-row">
+          <div><div class="week-date">5/19 – 5/25 (이번 주)</div><div class="week-badge badge-open">● 진행 중</div></div>
+          <div><div class="week-spent">¥12,450</div><div class="week-budget">예산 ¥20,000</div></div>
+        </div>
+        <div class="week-row">
+          <div><div class="week-date">5/12 – 5/18</div><div class="week-badge badge-surplus">↑ ¥3,200 이월</div></div>
+          <div><div class="week-spent">¥18,600</div><div class="week-budget">예산 ¥21,800</div></div>
+        </div>
+        <div class="week-row">
+          <div><div class="week-date">5/5 – 5/11</div><div class="week-badge badge-surplus">↗ ¥1,800 적금</div></div>
+          <div><div class="week-spent">¥19,200</div><div class="week-budget">예산 ¥21,000</div></div>
+        </div>
+        <div class="week-row">
+          <div><div class="week-date">4/28 – 5/4</div><div class="week-badge badge-deficit">↓ ¥2,400 초과</div></div>
+          <div><div class="week-spent">¥22,400</div><div class="week-budget">예산 ¥20,000</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSING -->
+  <div id="v-closing">
+    <div class="closing-hdr glass">
+      <div class="closing-title">이번 주 마감 처리</div>
+      <div class="closing-week">5월 3주차 · 5/19 – 5/25</div>
+    </div>
+
+    <div class="remaining-card">
+      <div class="rem-label">이번 주 잔액</div>
+      <div class="rem-amount"><span>¥</span>7,550</div>
+      <div class="rem-sub">예산 ¥20,000 중 ¥12,450 지출</div>
+    </div>
+
+    <div class="opts-title">잔액을 어떻게 처리할까요?</div>
+
+    <div class="opts">
+      <div class="opt-card glass" onclick="selectOpt(this,'carry')">
+        <div class="opt-radio"></div>
+        <div style="flex:1;"><div class="opt-title">전액 이월</div><div class="opt-desc">다음 주 예산에 전액 추가</div></div>
+        <div class="opt-amount">+¥7,550</div>
+      </div>
+      <div class="opt-card glass" onclick="selectOpt(this,'savings')">
+        <div class="opt-radio"></div>
+        <div style="flex:1;"><div class="opt-title">전액 적금 풀</div><div class="opt-desc">적금 풀 누적 · 현재 ¥28,400</div></div>
+        <div class="opt-amount">+¥7,550</div>
+      </div>
+      <div class="opt-card glass sel" onclick="selectOpt(this,'split')">
+        <div class="opt-radio"></div>
+        <div style="flex:1;"><div class="opt-title">직접 나누기</div><div class="opt-desc">이월 + 적금 풀 비율 설정</div></div>
+        <div class="opt-amount">¥7,550</div>
+      </div>
+    </div>
+
+    <div class="split-inputs show glass" id="splitInputs">
+      <div class="split-row"><div class="split-label">이월 금액</div><input class="split-input" type="number" value="4000" oninput="updateTotal()"></div>
+      <div class="split-row"><div class="split-label">적금 풀</div><input class="split-input" type="number" value="3550" oninput="updateTotal()"></div>
+      <div class="split-total">
+        <div class="split-total-label">합계</div>
+        <div class="split-total-val ok" id="splitTotal">¥7,550 ✓</div>
+      </div>
+    </div>
+
+    <div class="nxt-preview glass">
+      <div class="nxt-label">다음 주 예산 미리보기</div>
+      <div class="nxt-row"><div class="nxt-title">5/26 – 6/1</div><div class="nxt-amount">¥24,000</div></div>
+      <div class="nxt-breakdown">기준 ¥20,000 + 이월 ¥4,000</div>
+    </div>
+
+    <div class="confirm-btn">마감 확정하기</div>
+  </div>
+</div>
+
+<script>
+function switchTab(v,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('v-setting').style.display=v==='setting'?'block':'none';
+  document.getElementById('v-closing').style.display=v==='closing'?'block':'none';
+}
+function selectOpt(el,type){
+  document.querySelectorAll('.opt-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('splitInputs').classList.toggle('show',type==='split');
+}
+function updateTotal(){
+  const inputs=document.querySelectorAll('.split-input');
+  const total=Array.from(inputs).reduce((s,i)=>s+(Number(i.value)||0),0);
+  const el=document.getElementById('splitTotal');
+  const ok=total===7550;
+  el.textContent=ok?`¥${total.toLocaleString()} ✓`:`¥${total.toLocaleString()} (¥7,550 필요)`;
+  el.className='split-total-val'+(ok?' ok':'');
+}
+</script>
+</body>
+</html>

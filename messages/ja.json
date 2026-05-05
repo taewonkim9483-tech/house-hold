@@ -1,0 +1,66 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "back": "戻る",
+    "confirm": "確認",
+    "close": "閉じる"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "receipt": "レシート",
+    "budget": "予算",
+    "priceCompare": "価格比較",
+    "settings": "設定",
+    "report": "レポート"
+  },
+  "auth": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "signup": "会員登録",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "forgotPassword": "パスワードを忘れた方"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "thisMonth": "今月",
+    "budget": "予算",
+    "spent": "支出",
+    "remaining": "残り金額",
+    "recentReceipts": "最近のレシート"
+  },
+  "receipt": {
+    "title": "レシート",
+    "upload": "レシートをアップロード",
+    "analyze": "AI分析",
+    "store": "店舗",
+    "date": "日付",
+    "total": "合計",
+    "items": "品目"
+  },
+  "budget": {
+    "title": "予算管理",
+    "weekly": "週間予算",
+    "monthly": "月間予算",
+    "category": "カテゴリ",
+    "amount": "金額"
+  },
+  "priceCompare": {
+    "title": "価格比較",
+    "search": "商品検索",
+    "cheapest": "最安値",
+    "history": "価格履歴"
+  },
+  "settings": {
+    "title": "設定",
+    "language": "言語",
+    "group": "グループ",
+    "profile": "プロフィール",
+    "notifications": "通知"
+  }
+}

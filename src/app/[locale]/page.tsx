@@ -1,0 +1,12 @@
+import { useTranslations } from 'next-intl';
+
+export default function HomePage() {
+  const t = useTranslations('dashboard');
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      <h1 className="text-3xl font-bold">우리집 가계부</h1>
+      <p className="mt-2 text-gray-500">{t('title')}</p>
+    </main>
+  );
+}

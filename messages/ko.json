@@ -1,0 +1,66 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "back": "뒤로",
+    "confirm": "확인",
+    "close": "닫기"
+  },
+  "nav": {
+    "dashboard": "대시보드",
+    "receipt": "영수증",
+    "budget": "예산",
+    "priceCompare": "가격 비교",
+    "settings": "설정",
+    "report": "리포트"
+  },
+  "auth": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "signup": "회원가입",
+    "email": "이메일",
+    "password": "비밀번호",
+    "forgotPassword": "비밀번호 찾기"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "thisMonth": "이번 달",
+    "budget": "예산",
+    "spent": "지출",
+    "remaining": "남은 금액",
+    "recentReceipts": "최근 영수증"
+  },
+  "receipt": {
+    "title": "영수증",
+    "upload": "영수증 업로드",
+    "analyze": "AI 분석",
+    "store": "매장",
+    "date": "날짜",
+    "total": "합계",
+    "items": "항목"
+  },
+  "budget": {
+    "title": "예산 관리",
+    "weekly": "주간 예산",
+    "monthly": "월간 예산",
+    "category": "카테고리",
+    "amount": "금액"
+  },
+  "priceCompare": {
+    "title": "가격 비교",
+    "search": "상품 검색",
+    "cheapest": "최저가",
+    "history": "가격 이력"
+  },
+  "settings": {
+    "title": "설정",
+    "language": "언어",
+    "group": "그룹",
+    "profile": "프로필",
+    "notifications": "알림"
+  }
+}
