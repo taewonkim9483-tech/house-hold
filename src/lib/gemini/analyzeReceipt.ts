@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { AnalyzedReceipt } from '@/types/domain';
 
 const PROMPT = `Analyze this Japanese receipt image and extract all information.
@@ -49,19 +49,23 @@ export async function analyzeReceiptImage(imageBase64: string, mimeType: string)
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
+  const ai = new GoogleGenAI({ apiKey });
+
+  const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
-    systemInstruction: 'You are a receipt analyzer. Always respond in valid JSON only. No markdown, no explanation.',
-    generationConfig: { temperature: 0.1 },
+    contents: [
+      {
+        inlineData: { mimeType, data: imageBase64 },
+      },
+      { text: PROMPT },
+    ],
+    config: {
+      systemInstruction: 'You are a receipt analyzer. Always respond in valid JSON only. No markdown, no explanation.',
+      temperature: 0.1,
+    },
   });
 
-  const result = await model.generateContent([
-    PROMPT,
-    { inlineData: { mimeType, data: imageBase64 } },
-  ]);
-
-  const text = result.response.text();
+  const text = response.text ?? '';
   const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
   const parsed = JSON.parse(cleaned);
 
