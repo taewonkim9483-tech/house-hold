@@ -11,6 +11,25 @@ export interface User {
 export interface Group {
   id: string;
   name: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface GroupMember {
+  id: string;
+  groupId: string;
+  userId: string;
+  role: 'owner' | 'member';
+  joinedAt: string;
+  displayName?: string;
+}
+
+export interface GroupInvite {
+  id: string;
+  groupId: string;
+  token: string;
+  createdBy: string;
+  expiresAt: string;
   createdAt: string;
 }
 

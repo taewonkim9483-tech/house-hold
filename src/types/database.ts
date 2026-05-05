@@ -29,21 +29,67 @@ export interface Database {
           display_name?: string;
           lang?: 'ko' | 'ja';
         };
+        Relationships: [];
       };
       groups: {
         Row: {
           id: string;
           name: string;
+          created_by: string;
           created_at: string;
         };
         Insert: {
           id?: string;
           name: string;
+          created_by: string;
           created_at?: string;
         };
         Update: {
           name?: string;
         };
+        Relationships: [];
+      };
+      group_members: {
+        Row: {
+          id: string;
+          group_id: string;
+          user_id: string;
+          role: 'owner' | 'member';
+          joined_at: string;
+        };
+        Insert: {
+          id?: string;
+          group_id: string;
+          user_id: string;
+          role?: 'owner' | 'member';
+          joined_at?: string;
+        };
+        Update: {
+          role?: 'owner' | 'member';
+        };
+        Relationships: [];
+      };
+      group_invites: {
+        Row: {
+          id: string;
+          group_id: string;
+          token: string;
+          created_by: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          group_id: string;
+          token?: string;
+          created_by: string;
+          expires_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          expires_at?: string;
+        };
+        Relationships: [];
       };
       receipts: {
         Row: {
@@ -75,6 +121,7 @@ export interface Database {
           image_url?: string | null;
           raw_text?: string | null;
         };
+        Relationships: [];
       };
       receipt_items: {
         Row: {
@@ -102,6 +149,7 @@ export interface Database {
           amount?: number;
           category?: string | null;
         };
+        Relationships: [];
       };
       budgets: {
         Row: {
@@ -128,6 +176,7 @@ export interface Database {
           amount?: number;
           category?: string | null;
         };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
@@ -136,5 +185,6 @@ export interface Database {
       lang: 'ko' | 'ja';
       budget_period: 'weekly' | 'monthly';
     };
+    CompositeTypes: Record<string, never>;
   };
 }
