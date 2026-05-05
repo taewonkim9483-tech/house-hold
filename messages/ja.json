@@ -21,10 +21,10 @@
   "auth": {
     "login": "ログイン",
     "logout": "ログアウト",
-    "signup": "会員登録",
-    "email": "メールアドレス",
-    "password": "パスワード",
-    "forgotPassword": "パスワードを忘れた方"
+    "loginWithGoogle": "Googleでログイン",
+    "loginDescription": "Googleアカウントでログインしてください",
+    "inviteNotice": "家族の招待が届いています！",
+    "inviteDescription": "ログイン後、自動で家計簿が連携されます"
   },
   "dashboard": {
     "title": "ダッシュボード",

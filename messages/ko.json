@@ -21,10 +21,10 @@
   "auth": {
     "login": "로그인",
     "logout": "로그아웃",
-    "signup": "회원가입",
-    "email": "이메일",
-    "password": "비밀번호",
-    "forgotPassword": "비밀번호 찾기"
+    "loginWithGoogle": "Google로 로그인",
+    "loginDescription": "Google 계정으로 로그인하세요",
+    "inviteNotice": "가족 초대를 받으셨어요!",
+    "inviteDescription": "로그인 후 자동으로 가계부가 연결됩니다"
   },
   "dashboard": {
     "title": "대시보드",

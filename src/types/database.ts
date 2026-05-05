@@ -15,26 +15,19 @@ export interface Database {
       users: {
         Row: {
           id: string;
-          email: string;
+          display_name: string;
           lang: 'ko' | 'ja';
-          group_id: string | null;
           created_at: string;
-          updated_at: string;
         };
         Insert: {
           id?: string;
-          email: string;
+          display_name: string;
           lang?: 'ko' | 'ja';
-          group_id?: string | null;
           created_at?: string;
-          updated_at?: string;
         };
         Update: {
-          id?: string;
-          email?: string;
+          display_name?: string;
           lang?: 'ko' | 'ja';
-          group_id?: string | null;
-          updated_at?: string;
         };
       };
       groups: {
