@@ -51,7 +51,7 @@ export async function analyzeReceiptImage(imageBase64: string, mimeType: string)
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.0-flash',
     systemInstruction: 'You are a receipt analyzer. Always respond in valid JSON only. No markdown, no explanation.',
     generationConfig: { temperature: 0.1 },
   });
