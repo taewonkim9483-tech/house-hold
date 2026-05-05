@@ -1,7 +1,5 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { AnalyzedReceipt } from '@/types/domain';
-
-const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 const PROMPT = `Analyze this Japanese receipt image and extract all information.
 Also classify each item and assign tags for price comparison.
@@ -51,35 +49,19 @@ export async function analyzeReceiptImage(imageBase64: string, mimeType: string)
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
 
-  const body = {
-    system_instruction: {
-      parts: [{ text: 'You are a receipt analyzer. Always respond in valid JSON only. No markdown, no explanation.' }],
-    },
-    contents: [
-      {
-        parts: [
-          { text: PROMPT },
-          { inline_data: { mime_type: mimeType, data: imageBase64 } },
-        ],
-      },
-    ],
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    systemInstruction: 'You are a receipt analyzer. Always respond in valid JSON only. No markdown, no explanation.',
     generationConfig: { temperature: 0.1 },
-  };
-
-  const res = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
   });
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini API error: ${res.status} ${err}`);
-  }
+  const result = await model.generateContent([
+    PROMPT,
+    { inlineData: { mimeType, data: imageBase64 } },
+  ]);
 
-  const data = await res.json();
-  const text: string = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-
+  const text = result.response.text();
   const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
   const parsed = JSON.parse(cleaned);
 
