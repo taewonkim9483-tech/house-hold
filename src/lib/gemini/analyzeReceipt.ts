@@ -1,6 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
 import { AnalyzedReceipt } from '@/types/domain';
 
+// 우선순위 순서로 시도할 모델 목록
+const MODELS = ['gemini-2.0-flash-001', 'gemini-2.5-flash', 'gemini-flash-latest'];
+
 const PROMPT = `Analyze this Japanese receipt image and extract all information.
 Also classify each item and assign tags for price comparison.
 
@@ -45,46 +48,68 @@ const CATEGORY_MAP: Record<string, string> = {
   'その他': '기타',
 };
 
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function analyzeReceiptImage(imageBase64: string, mimeType: string): Promise<AnalyzedReceipt> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
 
   const ai = new GoogleGenAI({ apiKey });
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: [
-      {
-        inlineData: { mimeType, data: imageBase64 },
-      },
-      { text: PROMPT },
-    ],
-    config: {
-      systemInstruction: 'You are a receipt analyzer. Always respond in valid JSON only. No markdown, no explanation.',
-      temperature: 0.1,
-    },
-  });
+  let lastError: unknown;
 
-  const text = response.text ?? '';
-  const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-  const parsed = JSON.parse(cleaned);
+  for (const model of MODELS) {
+    // 각 모델에 대해 최대 2회 재시도 (503 대응)
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: [
+            { inlineData: { mimeType, data: imageBase64 } },
+            { text: PROMPT },
+          ],
+          config: {
+            systemInstruction: 'You are a receipt analyzer. Always respond in valid JSON only. No markdown, no explanation.',
+            temperature: 0.1,
+          },
+        });
 
-  return {
-    storeName: parsed.store_name,
-    purchasedAt: parsed.purchased_at,
-    totalAmount: parsed.total_amount,
-    taxAmount: parsed.tax_amount ?? null,
-    items: parsed.items.map((item: Record<string, unknown>) => ({
-      name: item.name,
-      quantity: item.quantity,
-      unitPrice: item.unit_price,
-      subtotal: item.subtotal,
-      category: CATEGORY_MAP[item.category as string] ?? '기타',
-      tags: item.tags ?? [],
-      unitType: item.unit_type ?? 'per_count',
-      weightG: item.weight_g ?? null,
-      volumeMl: item.volume_ml ?? null,
-      pricePer100: item.price_per_100 ?? null,
-    })),
-  };
+        const text = response.text ?? '';
+        const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+        const parsed = JSON.parse(cleaned);
+
+        return {
+          storeName: parsed.store_name,
+          purchasedAt: parsed.purchased_at,
+          totalAmount: parsed.total_amount,
+          taxAmount: parsed.tax_amount ?? null,
+          items: parsed.items.map((item: Record<string, unknown>) => ({
+            name: item.name,
+            quantity: item.quantity,
+            unitPrice: item.unit_price,
+            subtotal: item.subtotal,
+            category: CATEGORY_MAP[item.category as string] ?? '기타',
+            tags: item.tags ?? [],
+            unitType: item.unit_type ?? 'per_count',
+            weightG: item.weight_g ?? null,
+            volumeMl: item.volume_ml ?? null,
+            pricePer100: item.price_per_100 ?? null,
+          })),
+        };
+      } catch (e) {
+        lastError = e;
+        const status = (e as { status?: number })?.status;
+        // 503이면 잠시 대기 후 재시도, 그 외 에러는 다음 모델로
+        if (status === 503 && attempt === 0) {
+          await sleep(2000);
+          continue;
+        }
+        break;
+      }
+    }
+  }
+
+  throw lastError;
 }
