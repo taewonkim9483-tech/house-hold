@@ -33,26 +33,64 @@ export interface GroupInvite {
   createdAt: string;
 }
 
+export interface Category {
+  id: string;
+  groupId: string | null;
+  nameKo: string;
+  nameJa: string;
+  icon: string;
+  isSystem: boolean;
+  sortOrder: number;
+}
+
+export type UnitType = 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
+
 export interface Receipt {
   id: string;
   groupId: string;
-  userId: string;
+  uploadedBy: string;
   storeName: string;
   purchasedAt: string;
   totalAmount: number;
+  taxAmount: number | null;
   imageUrl: string | null;
-  items: ReceiptItem[];
   createdAt: string;
 }
 
 export interface ReceiptItem {
   id: string;
   receiptId: string;
-  productName: string;
+  name: string;
+  categoryId: string | null;
   quantity: number;
   unitPrice: number;
-  amount: number;
-  category: string | null;
+  subtotal: number;
+  unitType: UnitType;
+  weightG: number | null;
+  volumeMl: number | null;
+  pricePer100: number | null;
+}
+
+/** Gemini API 분석 결과 (저장 전 미리보기용) */
+export interface AnalyzedItem {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  category: string;
+  tags: string[];
+  unitType: UnitType;
+  weightG: number | null;
+  volumeMl: number | null;
+  pricePer100: number | null;
+}
+
+export interface AnalyzedReceipt {
+  storeName: string;
+  purchasedAt: string;
+  totalAmount: number;
+  taxAmount: number | null;
+  items: AnalyzedItem[];
 }
 
 export interface Budget {

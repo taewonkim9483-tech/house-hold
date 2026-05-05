@@ -41,7 +41,22 @@
     "store": "매장",
     "date": "날짜",
     "total": "합계",
-    "items": "항목"
+    "items": "항목",
+    "register": "영수증 등록",
+    "analyzing": "AI가 분석 중이에요...",
+    "analyzingSubtext": "잠시만 기다려주세요",
+    "resultTitle": "분석 결과 확인",
+    "saveToLedger": "가계부에 저장하기",
+    "addItem": "＋ 상품 추가",
+    "editItem": "상품 편집",
+    "itemName": "상품명",
+    "category": "카테고리",
+    "quantity": "수량",
+    "unitPrice": "단가 (¥)",
+    "weightG": "중량 (g)",
+    "per100g": "100g당 단가",
+    "saving": "저장 중...",
+    "saveFailed": "저장 실패"
   },
   "budget": {
     "title": "예산 관리",

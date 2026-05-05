@@ -48,13 +48,13 @@ export default async function GroupPage({
 
   const { data: receipts } = await supabase
     .from('receipts')
-    .select('user_id, total_amount')
+    .select('uploaded_by, total_amount')
     .eq('group_id', groupId)
     .gte('purchased_at', weekStart.toISOString());
 
   const spendingMap = new Map<string, number>();
   for (const r of receipts ?? []) {
-    spendingMap.set(r.user_id, (spendingMap.get(r.user_id) ?? 0) + r.total_amount);
+    spendingMap.set(r.uploaded_by, (spendingMap.get(r.uploaded_by) ?? 0) + r.total_amount);
   }
 
   const stats = memberList.map(m => ({

@@ -41,7 +41,22 @@
     "store": "店舗",
     "date": "日付",
     "total": "合計",
-    "items": "品目"
+    "items": "品目",
+    "register": "レシート登録",
+    "analyzing": "AIが分析中です...",
+    "analyzingSubtext": "少々お待ちください",
+    "resultTitle": "分析結果の確認",
+    "saveToLedger": "家計簿に保存する",
+    "addItem": "＋ 商品を追加",
+    "editItem": "商品を編集",
+    "itemName": "商品名",
+    "category": "カテゴリ",
+    "quantity": "数量",
+    "unitPrice": "単価 (¥)",
+    "weightG": "重量 (g)",
+    "per100g": "100gあたりの単価",
+    "saving": "保存中...",
+    "saveFailed": "保存失敗"
   },
   "budget": {
     "title": "予算管理",

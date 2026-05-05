@@ -91,35 +91,68 @@ export interface Database {
         };
         Relationships: [];
       };
+      categories: {
+        Row: {
+          id: string;
+          group_id: string | null;
+          name_ko: string;
+          name_ja: string;
+          icon: string;
+          is_system: boolean;
+          sort_order: number;
+        };
+        Insert: {
+          id?: string;
+          group_id?: string | null;
+          name_ko: string;
+          name_ja: string;
+          icon: string;
+          is_system?: boolean;
+          sort_order?: number;
+        };
+        Update: {
+          name_ko?: string;
+          name_ja?: string;
+          icon?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
+      tags: {
+        Row: { id: string; name: string; created_at: string };
+        Insert: { id?: string; name: string; created_at?: string };
+        Update: { name?: string };
+        Relationships: [];
+      };
       receipts: {
         Row: {
           id: string;
           group_id: string;
-          user_id: string;
+          uploaded_by: string;
           store_name: string;
           purchased_at: string;
           total_amount: number;
+          tax_amount: number | null;
           image_url: string | null;
-          raw_text: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           group_id: string;
-          user_id: string;
+          uploaded_by: string;
           store_name: string;
           purchased_at: string;
           total_amount: number;
+          tax_amount?: number | null;
           image_url?: string | null;
-          raw_text?: string | null;
           created_at?: string;
         };
         Update: {
           store_name?: string;
           purchased_at?: string;
           total_amount?: number;
+          tax_amount?: number | null;
           image_url?: string | null;
-          raw_text?: string | null;
         };
         Relationships: [];
       };
@@ -127,27 +160,74 @@ export interface Database {
         Row: {
           id: string;
           receipt_id: string;
-          product_name: string;
+          name: string;
+          category_id: string | null;
           quantity: number;
           unit_price: number;
-          amount: number;
-          category: string | null;
+          subtotal: number;
+          unit_type: 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
+          weight_g: number | null;
+          volume_ml: number | null;
+          price_per_100: number | null;
+          created_at: string;
         };
         Insert: {
           id?: string;
           receipt_id: string;
-          product_name: string;
-          quantity: number;
+          name: string;
+          category_id?: string | null;
+          quantity?: number;
           unit_price: number;
-          amount: number;
-          category?: string | null;
+          subtotal: number;
+          unit_type?: 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
+          weight_g?: number | null;
+          volume_ml?: number | null;
+          price_per_100?: number | null;
+          created_at?: string;
         };
         Update: {
-          product_name?: string;
+          name?: string;
+          category_id?: string | null;
           quantity?: number;
           unit_price?: number;
-          amount?: number;
-          category?: string | null;
+          subtotal?: number;
+          unit_type?: 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
+          weight_g?: number | null;
+          volume_ml?: number | null;
+          price_per_100?: number | null;
+        };
+        Relationships: [];
+      };
+      item_tags: {
+        Row: { item_id: string; tag_id: string };
+        Insert: { item_id: string; tag_id: string };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      budget_weeks: {
+        Row: {
+          id: string;
+          budget_id: string;
+          week_start: string;
+          week_end: string;
+          base_amount: number;
+          spent_amount: number;
+          status: 'open' | 'pending_close' | 'closed';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          budget_id: string;
+          week_start: string;
+          week_end: string;
+          base_amount: number;
+          spent_amount?: number;
+          status?: 'open' | 'pending_close' | 'closed';
+          created_at?: string;
+        };
+        Update: {
+          spent_amount?: number;
+          status?: 'open' | 'pending_close' | 'closed';
         };
         Relationships: [];
       };
