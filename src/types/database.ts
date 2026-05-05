@@ -235,27 +235,82 @@ export interface Database {
         Row: {
           id: string;
           group_id: string;
-          period: 'weekly' | 'monthly';
-          category: string | null;
-          amount: number;
-          year: number;
-          week_or_month: number;
+          weekly_amount: number;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
           group_id: string;
-          period: 'weekly' | 'monthly';
-          category?: string | null;
-          amount: number;
-          year: number;
-          week_or_month: number;
+          weekly_amount: number;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
-          amount?: number;
-          category?: string | null;
+          weekly_amount?: number;
+          updated_at?: string;
         };
+        Relationships: [];
+      };
+      budget_closings: {
+        Row: {
+          id: string;
+          budget_week_id: string;
+          remaining: number;
+          to_carry_over: number;
+          to_savings_pool: number;
+          closed_at: string;
+          closed_by: string;
+        };
+        Insert: {
+          id?: string;
+          budget_week_id: string;
+          remaining: number;
+          to_carry_over?: number;
+          to_savings_pool?: number;
+          closed_at?: string;
+          closed_by: string;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      savings_pool: {
+        Row: {
+          id: string;
+          group_id: string;
+          total_amount: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          group_id: string;
+          total_amount?: number;
+          updated_at?: string;
+        };
+        Update: {
+          total_amount?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      savings_pool_logs: {
+        Row: {
+          id: string;
+          pool_id: string;
+          amount: number;
+          reason: string;
+          week_label: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          pool_id: string;
+          amount: number;
+          reason: string;
+          week_label?: string | null;
+          created_at?: string;
+        };
+        Update: Record<string, never>;
         Relationships: [];
       };
     };
@@ -263,7 +318,6 @@ export interface Database {
     Functions: Record<string, never>;
     Enums: {
       lang: 'ko' | 'ja';
-      budget_period: 'weekly' | 'monthly';
     };
     CompositeTypes: Record<string, never>;
   };

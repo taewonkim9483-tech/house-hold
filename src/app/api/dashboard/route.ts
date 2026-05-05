@@ -40,9 +40,8 @@ export async function GET() {
   // 주간 예산: budgets → budget_weeks 조인
   const { data: budgetRow } = await supabase
     .from('budgets')
-    .select('id, amount')
+    .select('id, weekly_amount')
     .eq('group_id', groupId)
-    .eq('period', 'weekly')
     .maybeSingle();
 
   let budget = 0;
@@ -57,7 +56,7 @@ export async function GET() {
       .lte('week_end', end)
       .maybeSingle();
 
-    budget = weekRow?.base_amount ?? budgetRow.amount;
+    budget = weekRow?.base_amount ?? budgetRow.weekly_amount;
     spent = weekRow?.spent_amount ?? 0;
   }
 

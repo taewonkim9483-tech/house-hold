@@ -87,6 +87,13 @@ export default function WeeklyBudgetCard({ week, locale }: { week: WeekData; loc
           </div>
         </div>
       )}
+
+      <a
+        href={`/${locale}/budget`}
+        style={{ display:'block', marginTop:16, textAlign:'center', color:'rgba(99,102,241,0.8)', fontSize:12, fontWeight:500, textDecoration:'none' }}
+      >
+        {locale === 'ja' ? '予算を管理する →' : '예산 관리 →'}
+      </a>
     </div>
   );
 }
