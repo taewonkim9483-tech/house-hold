@@ -109,3 +109,35 @@ export interface PriceRecord {
   unitPrice: number;
   purchasedAt: string;
 }
+
+export interface IdentifiedProduct {
+  name: string;
+  brand: string;
+  volume_ml: number | null;
+  weight_g: number | null;
+  unit_type: string;
+  tags: string[];
+}
+
+export interface PriceHistoryRecord {
+  store_name: string;
+  purchased_at: string;
+  unit_price: number;
+  price_per_100: number | null;
+  is_lowest: boolean;
+}
+
+export interface SimilarItem {
+  name: string;
+  brand: string;
+  weight_g: number | null;
+  volume_ml: number | null;
+  latest_price: PriceHistoryRecord;
+  matched_tags: string[];
+}
+
+export interface PriceCompareResult {
+  identified: IdentifiedProduct;
+  same_product: PriceHistoryRecord[];
+  similar_products: SimilarItem[];
+}
