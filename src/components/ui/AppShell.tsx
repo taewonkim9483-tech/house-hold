@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { icon: '🏠', ko: '홈', ja: 'ホーム', href: '/dashboard' },
   { icon: '📋', ko: '내역', ja: '履歴', href: '/receipts' },
   { icon: '💰', ko: '예산', ja: '予算', href: '/budget' },
-  { icon: '📊', ko: '리포트', ja: 'レポート', href: '/report' },
+  { icon: '🏦', ko: '적금', ja: '積立', href: '/savings' },
   { icon: '⚙️', ko: '설정', ja: '設定', href: '/settings' },
 ];
 
