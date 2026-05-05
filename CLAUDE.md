@@ -72,6 +72,22 @@ Light Pastel Liquid Glass 스타일. 참조: `docs/screens/*.html`
 3. 각 태스크 완료 조건(Acceptance Criteria) 체크 후 다음 태스크 진행.
 4. 컴포넌트는 `features/` 안에 기능별 폴더로 구성.
 
+## DB 마이그레이션
+
+마이그레이션 파일 위치: `supabase/migrations/YYYYMMDDHHMMSS_<description>.sql`
+
+```bash
+# 원격 Supabase 프로젝트에 마이그레이션 적용
+supabase db push
+
+# 로컬 개발 DB에 적용 (로컬 supabase start 상태에서)
+supabase migration up
+```
+
+- 파일명 타임스탬프는 이전 마이그레이션보다 큰 값으로 설정
+- 각 태스크 SQL은 `docs/tasks/TASK-XX-*.md` 의 **DB 마이그레이션** 섹션 기준
+- `supabase db push` 실행 전 `.env.local` 의 `NEXT_PUBLIC_SUPABASE_URL` 로 연결된 프로젝트 확인
+
 ## 참조 문서 맵
 | 필요 정보 | 파일 |
 |---|---|
