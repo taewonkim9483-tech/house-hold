@@ -143,14 +143,17 @@ begin
 end;
 $$;
 
-select cron.schedule(
-  'weekly-budget-pending',
-  '30 14 * * 0',
-  $$ select public.set_budget_pending_close(); $$
-);
-
-select cron.schedule(
-  'weekly-budget-auto-close',
-  '5 15 * * 0',
-  $$ select public.auto_close_pending_budgets(); $$
-);
+-- pg_cron 등록은 Supabase 대시보드 SQL Editor에서 수동 실행 필요:
+-- (pg_cron 확장 활성화 후)
+--
+-- select cron.schedule(
+--   'weekly-budget-pending',
+--   '30 14 * * 0',
+--   $$ select public.set_budget_pending_close(); $$
+-- );
+--
+-- select cron.schedule(
+--   'weekly-budget-auto-close',
+--   '5 15 * * 0',
+--   $$ select public.auto_close_pending_budgets(); $$
+-- );
