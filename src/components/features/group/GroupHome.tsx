@@ -9,6 +9,7 @@ interface Member {
   user_id: string;
   role: 'owner' | 'member';
   display_name: string;
+  avatar_url: string | null;
 }
 
 interface Props {
@@ -78,11 +79,29 @@ export function GroupHome({ groupId, groupName, members, currentUserId, currentU
                 className="flex items-center justify-between rounded-xl px-4 py-3"
                 style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.1)' }}
               >
-                <div>
-                  <span className="text-sm font-medium text-[rgba(40,40,55,0.88)]">{m.display_name}</span>
-                  <span className="ml-2 text-xs text-[rgba(80,80,110,0.58)]">
-                    {m.role === 'owner' ? t('owner') : t('member')}
-                  </span>
+                <div className="flex items-center gap-3">
+                  {m.avatar_url ? (
+                    <img
+                      src={m.avatar_url}
+                      alt={m.display_name}
+                      style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                      background: 'linear-gradient(135deg, rgba(139,92,246,0.7), rgba(99,102,241,0.7))',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, color: 'white', fontWeight: 700,
+                    }}>
+                      {m.display_name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-sm font-medium text-[rgba(40,40,55,0.88)]">{m.display_name}</span>
+                    <span className="ml-2 text-xs text-[rgba(80,80,110,0.58)]">
+                      {m.role === 'owner' ? t('owner') : t('member')}
+                    </span>
+                  </div>
                 </div>
                 {currentUserRole === 'owner' && m.user_id !== currentUserId && (
                   <button

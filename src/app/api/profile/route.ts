@@ -8,12 +8,12 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('users')
-    .select('id, email, display_name, avatar_url')
+    .select('id, display_name, avatar_url')
     .eq('id', user.id)
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json({ ...data, email: user.email ?? '' });
 }
 
 export async function PATCH(request: Request) {

@@ -29,15 +29,16 @@ export default async function GroupPage({
     supabase.from('groups').select('id, name').eq('id', groupId).single(),
     supabase
       .from('group_members')
-      .select('id, user_id, role, users(display_name)')
+      .select('id, user_id, role, users(display_name, avatar_url)')
       .eq('group_id', groupId),
   ]);
 
-  const memberList = (members ?? []).map((m: { id: string; user_id: string; role: string; users: { display_name: string } | null }) => ({
+  const memberList = (members ?? []).map((m: { id: string; user_id: string; role: string; users: { display_name: string; avatar_url: string | null } | null }) => ({
     id: m.id,
     user_id: m.user_id,
     role: m.role as 'owner' | 'member',
     display_name: m.users?.display_name ?? m.user_id,
+    avatar_url: m.users?.avatar_url ?? null,
   }));
 
   // G-3: 이번 주 멤버별 지출 집계

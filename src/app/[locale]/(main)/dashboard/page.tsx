@@ -28,15 +28,16 @@ export default async function DashboardPage({
 
   const { data: profile } = await supabase
     .from('users')
-    .select('display_name')
+    .select('display_name, avatar_url')
     .eq('id', user!.id)
-    .maybeSingle() as { data: { display_name: string } | null };
+    .maybeSingle() as { data: { display_name: string; avatar_url: string | null } | null };
 
   const dashboard = await getDashboardData();
 
   const greeting = locale === 'ja' ? 'こんにちは 👋' : '안녕하세요 👋';
   const displayName = profile?.display_name ?? user?.email ?? '';
   const initial = displayName.charAt(0).toUpperCase();
+  const avatarUrl = profile?.avatar_url ?? null;
 
   const defaultWeek = { budget: 0, spent: 0, remaining: 0, start: '', end: '' };
 
@@ -48,18 +49,30 @@ export default async function DashboardPage({
           <div style={{ color:'rgba(80,80,110,0.58)', fontSize:13 }}>{greeting}</div>
           <div style={{ color:'rgba(40,40,55,0.88)', fontSize:22, fontWeight:700, marginTop:2, letterSpacing:'-0.5px' }}>우리집 가계부</div>
         </div>
-        <div
-          style={{
-            width:42, height:42, borderRadius:'50%',
-            background:'linear-gradient(135deg,rgba(139,92,246,0.7),rgba(99,102,241,0.7))',
-            border:'2px solid rgba(255,255,255,0.9)',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize:16, color:'white', fontWeight:700,
-            boxShadow:'0 4px 14px rgba(139,92,246,0.25)',
-          }}
-        >
-          {initial}
-        </div>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={displayName}
+            style={{
+              width:42, height:42, borderRadius:'50%', objectFit:'cover',
+              border:'2px solid rgba(255,255,255,0.9)',
+              boxShadow:'0 4px 14px rgba(139,92,246,0.25)',
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width:42, height:42, borderRadius:'50%',
+              background:'linear-gradient(135deg,rgba(139,92,246,0.7),rgba(99,102,241,0.7))',
+              border:'2px solid rgba(255,255,255,0.9)',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              fontSize:16, color:'white', fontWeight:700,
+              boxShadow:'0 4px 14px rgba(139,92,246,0.25)',
+            }}
+          >
+            {initial}
+          </div>
+        )}
       </div>
 
       <WeeklyBudgetCard week={dashboard?.week ?? defaultWeek} locale={locale} />
