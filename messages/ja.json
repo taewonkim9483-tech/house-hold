@@ -106,6 +106,21 @@
     "inviteExpired": "招待リンクの有効期限が切れています",
     "inviteInvalid": "無効な招待リンクです",
     "groupFull": "グループは満員です（最大2人）",
-    "alreadyMember": "すでにグループのメンバーです"
+    "alreadyMember": "すでにグループのメンバーです",
+    "manage": "グループ管理",
+    "editName": "グループ名を編集",
+    "memberMenu": "メンバーメニュー",
+    "changeRole": "権限変更",
+    "promoteToOwner": "オーナーに変更",
+    "keepMember": "メンバーのまま",
+    "kickMember": "退出させる",
+    "kickConfirm": "本当にこのメンバーを退出させますか？",
+    "leaveGroup": "グループを退出",
+    "leaveConfirm": "本当にグループを退出しますか？",
+    "leaveOwnerError": "他のメンバーにオーナー権限を委任してから退出してください",
+    "roleChanged": "権限が変更されました",
+    "singleOwnerError": "グループのオーナーが1人のため、降格できません",
+    "cancel": "キャンセル",
+    "save": "保存"
   }
 }

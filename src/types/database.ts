@@ -61,6 +61,7 @@ export interface Database {
           user_id: string;
           role: 'owner' | 'member';
           joined_at: string;
+          role_updated_at: string | null;
         };
         Insert: {
           id?: string;
@@ -68,9 +69,11 @@ export interface Database {
           user_id: string;
           role?: 'owner' | 'member';
           joined_at?: string;
+          role_updated_at?: string | null;
         };
         Update: {
           role?: 'owner' | 'member';
+          role_updated_at?: string | null;
         };
         Relationships: [];
       };
@@ -316,6 +319,32 @@ export interface Database {
           created_at?: string;
         };
         Update: Record<string, never>;
+        Relationships: [];
+      };
+      custom_units: {
+        Row: {
+          id: string;
+          group_id: string;
+          item_name: string | null;
+          category_id: string | null;
+          unit_type: 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          group_id: string;
+          item_name?: string | null;
+          category_id?: string | null;
+          unit_type: 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
+          created_by: string;
+          created_at?: string;
+        };
+        Update: {
+          item_name?: string | null;
+          category_id?: string | null;
+          unit_type?: 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
+        };
         Relationships: [];
       };
     };

@@ -14,8 +14,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     .single();
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
+  type UnitType = 'per_100g' | 'per_100ml' | 'per_count' | 'per_g' | 'per_ml';
   const body = await request.json() as { item_name?: string; category_id?: string; unit_type?: string };
-  const validTypes = ['per_100g', 'per_100ml', 'per_count', 'per_g', 'per_ml'];
+  const validTypes: string[] = ['per_100g', 'per_100ml', 'per_count', 'per_g', 'per_ml'];
   if (body.unit_type && !validTypes.includes(body.unit_type)) {
     return NextResponse.json({ error: 'Invalid unit_type' }, { status: 400 });
   }
@@ -25,7 +26,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     .update({
       item_name: body.item_name ?? null,
       category_id: body.category_id ?? null,
-      ...(body.unit_type ? { unit_type: body.unit_type } : {}),
+      ...(body.unit_type ? { unit_type: body.unit_type as UnitType } : {}),
     })
     .eq('id', id)
     .eq('group_id', member.group_id);

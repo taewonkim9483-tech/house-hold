@@ -106,6 +106,21 @@
     "inviteExpired": "만료된 초대 링크입니다",
     "inviteInvalid": "유효하지 않은 초대 링크입니다",
     "groupFull": "그룹이 가득 찼습니다 (최대 2인)",
-    "alreadyMember": "이미 그룹 멤버입니다"
+    "alreadyMember": "이미 그룹 멤버입니다",
+    "manage": "그룹 관리",
+    "editName": "그룹 이름 수정",
+    "memberMenu": "멤버 메뉴",
+    "changeRole": "권한 변경",
+    "promoteToOwner": "오너로 변경",
+    "keepMember": "멤버 유지",
+    "kickMember": "강퇴하기",
+    "kickConfirm": "정말로 이 멤버를 강퇴하시겠습니까?",
+    "leaveGroup": "그룹 탈퇴",
+    "leaveConfirm": "정말로 그룹을 탈퇴하시겠습니까?",
+    "leaveOwnerError": "다른 멤버에게 오너 권한을 위임 후 탈퇴하세요",
+    "roleChanged": "권한이 변경되었습니다",
+    "singleOwnerError": "그룹에 오너가 1명이므로 강등할 수 없습니다",
+    "cancel": "취소",
+    "save": "저장"
   }
 }

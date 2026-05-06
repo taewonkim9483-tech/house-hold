@@ -13,7 +13,7 @@ export async function PUT(request: Request) {
 
   const { error } = await supabase
     .from('users')
-    .update({ lang })
+    .update({ lang: lang as 'ko' | 'ja' })
     .eq('id', user.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
