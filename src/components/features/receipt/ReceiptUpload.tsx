@@ -8,6 +8,33 @@ interface Props {
   locale: string;
 }
 
+async function compressImage(file: File, maxPx = 1920, quality = 0.75): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error('압축 실패')); return; }
+          resolve(new File([blob], 'receipt.jpg', { type: 'image/jpeg' }));
+        },
+        'image/jpeg',
+        quality,
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('이미지 로드 실패')); };
+    img.src = url;
+  });
+}
+
 export default function ReceiptUpload({ locale }: Props) {
   const [stage, setStage] = useState<'upload' | 'analyzing' | 'result'>('upload');
   const [analyzed, setAnalyzed] = useState<AnalyzedReceipt | null>(null);
@@ -20,13 +47,20 @@ export default function ReceiptUpload({ locale }: Props) {
     setError(null);
     setStage('analyzing');
 
-    const buffer = await file.arrayBuffer();
+    let compressed: File;
+    try {
+      compressed = await compressImage(file);
+    } catch {
+      compressed = file;
+    }
+
+    const buffer = await compressed.arrayBuffer();
     const base64 = Buffer.from(buffer).toString('base64');
     setImageBase64(base64);
-    setImageMimeType(file.type);
+    setImageMimeType(compressed.type);
 
     const fd = new FormData();
-    fd.append('image', file);
+    fd.append('image', compressed);
 
     try {
       const res = await fetch('/api/receipts/analyze', { method: 'POST', body: fd });
