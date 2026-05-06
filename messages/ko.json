@@ -121,6 +121,8 @@
     "roleChanged": "권한이 변경되었습니다",
     "singleOwnerError": "그룹에 오너가 1명이므로 강등할 수 없습니다",
     "cancel": "취소",
-    "save": "저장"
+    "save": "저장",
+    "myGroups": "내 그룹",
+    "backToGroups": "내 그룹으로"
   }
 }

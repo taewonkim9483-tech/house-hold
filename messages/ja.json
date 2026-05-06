@@ -121,6 +121,8 @@
     "roleChanged": "権限が変更されました",
     "singleOwnerError": "グループのオーナーが1人のため、降格できません",
     "cancel": "キャンセル",
-    "save": "保存"
+    "save": "保存",
+    "myGroups": "マイグループ",
+    "backToGroups": "グループ一覧へ"
   }
 }
