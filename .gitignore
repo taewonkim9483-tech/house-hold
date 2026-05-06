@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+/docs
+
+우리집가계부_PRD_v1.0.docx
+
 # next.js
 /.next/
 /out/
