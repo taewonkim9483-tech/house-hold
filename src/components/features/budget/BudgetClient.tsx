@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import ScopeSelector from '@/components/features/scope/ScopeSelector';
+import { useScopeStore } from '@/hooks/useScopeStore';
 
 interface BudgetWeek {
   id: string;
@@ -61,6 +62,7 @@ function formatDate(s: string): string {
 const PRESETS = [15000, 20000, 25000, 30000];
 
 export default function BudgetClient({ weeklyAmount, weeks, current, locale }: BudgetClientProps) {
+  const { scope } = useScopeStore();
   const [tab, setTab] = useState<'setting' | 'closing'>('setting');
   const [inputAmount, setInputAmount] = useState(String(weeklyAmount ?? 20000));
   const [saving, setSaving] = useState(false);
@@ -83,10 +85,11 @@ export default function BudgetClient({ weeklyAmount, weeks, current, locale }: B
     if (!amount || amount <= 0) return;
     setSaving(true);
     setSaveMsg('');
+    const groupId = scope.type === 'group' ? scope.groupId : undefined;
     const res = await fetch('/api/budgets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ weekly_amount: amount }),
+      body: JSON.stringify({ weekly_amount: amount, group_id: groupId }),
     });
     setSaving(false);
     if (res.ok) {

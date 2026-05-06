@@ -24,7 +24,8 @@ export async function GET() {
     .from('group_members')
     .select('group_id')
     .eq('user_id', user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
   const { data: budget } = await supabase
@@ -50,16 +51,14 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { weekly_amount } = await request.json() as { weekly_amount: number };
+  const { weekly_amount, group_id } = await request.json() as { weekly_amount: number; group_id?: string };
   if (!Number.isInteger(weekly_amount) || weekly_amount <= 0) {
     return NextResponse.json({ error: 'Invalid weekly_amount' }, { status: 400 });
   }
 
-  const { data: member } = await supabase
-    .from('group_members')
-    .select('group_id')
-    .eq('user_id', user.id)
-    .single();
+  let query = supabase.from('group_members').select('group_id').eq('user_id', user.id);
+  if (group_id) query = query.eq('group_id', group_id);
+  const { data: member } = await query.limit(1).maybeSingle();
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
   const { data: budget, error: upsertError } = await supabase
