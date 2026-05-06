@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { useState } from 'react';
 
 interface LanguageClientProps {
   locale: string;
@@ -21,15 +21,8 @@ const LANGS = [
 
 export default function LanguageClient({ locale, currentLang }: LanguageClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [saving, setSaving] = useState(false);
-  const [pendingLang, setPendingLang] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!pendingLang) return;
-    document.cookie = `NEXT_LOCALE=${pendingLang}; path=/; max-age=31536000`;
-    router.push(`/${pendingLang}/settings/language`);
-    router.refresh();
-  }, [pendingLang, router]);
 
   async function handleSelect(lang: string) {
     if (lang === currentLang || saving) return;
@@ -41,14 +34,15 @@ export default function LanguageClient({ locale, currentLang }: LanguageClientPr
       body: JSON.stringify({ lang }),
     });
 
-    setPendingLang(lang);
+    router.replace(pathname, { locale: lang });
+    setSaving(false);
   }
 
   return (
     <div>
       <div style={{ padding: '52px 16px 8px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push('/settings')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: ts, padding: 0 }}
         >
           ‹
