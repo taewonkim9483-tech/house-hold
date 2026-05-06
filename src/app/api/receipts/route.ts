@@ -209,19 +209,27 @@ export async function POST(request: Request) {
 
   // 주간 예산 spent_amount 업데이트
   const purchasedDate = new Date(receipt.purchasedAt).toISOString().split('T')[0];
-  const { data: budgetWeek } = await supabase
-    .from('budget_weeks')
-    .select('id, spent_amount')
-    .eq('week_start', purchasedDate)
-    .lte('week_start', purchasedDate)
-    .gte('week_end', purchasedDate)
+  const { data: budgetRow } = await supabase
+    .from('budgets')
+    .select('id')
+    .eq('group_id', groupId)
     .maybeSingle();
 
-  if (budgetWeek) {
-    await supabase
+  if (budgetRow) {
+    const { data: budgetWeek } = await supabase
       .from('budget_weeks')
-      .update({ spent_amount: budgetWeek.spent_amount + receipt.totalAmount })
-      .eq('id', budgetWeek.id);
+      .select('id, spent_amount')
+      .eq('budget_id', budgetRow.id)
+      .lte('week_start', purchasedDate)
+      .gte('week_end', purchasedDate)
+      .maybeSingle();
+
+    if (budgetWeek) {
+      await supabase
+        .from('budget_weeks')
+        .update({ spent_amount: budgetWeek.spent_amount + receipt.totalAmount })
+        .eq('id', budgetWeek.id);
+    }
   }
 
   return NextResponse.json({ receipt_id: receiptRow.id });

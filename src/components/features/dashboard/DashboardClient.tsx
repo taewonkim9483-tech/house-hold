@@ -49,7 +49,11 @@ export default function DashboardClient({ locale, displayName, initial, avatarUr
 
   useEffect(() => {
     const params = new URLSearchParams();
-    if (scope.type === 'personal') params.set('scope', 'personal');
+    if (scope.type === 'personal') {
+      params.set('scope', 'personal');
+    } else if (scope.type === 'group') {
+      params.set('group_id', scope.groupId);
+    }
     fetch(`/api/dashboard?${params}`)
       .then((r) => r.ok ? r.json() : null)
       .then(setDashboard);

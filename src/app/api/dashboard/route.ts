@@ -28,6 +28,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const scope = searchParams.get('scope'); // 'personal' | null
+  const requestedGroupId = searchParams.get('group_id');
 
   const { data: member } = await supabase
     .from('group_members')
@@ -38,7 +39,8 @@ export async function GET(request: Request) {
 
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
-  const groupId: string = member.group_id;
+  // 클라이언트가 명시한 group_id가 있으면 사용, 없으면 첫 번째 멤버십 사용
+  const groupId: string = requestedGroupId ?? member.group_id;
   const isPersonal = scope === 'personal';
   const { start, end } = getWeekRange(new Date());
 
