@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { icon: '🏠', ko: '홈', ja: 'ホーム', href: '/dashboard' },
   { icon: '📋', ko: '내역', ja: '履歴', href: '/receipts' },
   { icon: '💰', ko: '예산', ja: '予算', href: '/budget' },
+  { icon: '📊', ko: '리포트', ja: 'レポート', href: '/report' },
   { icon: '🏦', ko: '적금', ja: '積立', href: '/savings' },
   { icon: '⚙️', ko: '설정', ja: '設定', href: '/settings' },
 ];
@@ -89,7 +90,7 @@ export default function AppShell({ children, locale }: AppShellProps) {
                 href={href}
                 style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  gap: 3, padding: '6px 14px', borderRadius: 14, flex: 1,
+                  gap: 3, padding: '6px 8px', borderRadius: 14, flex: 1,
                   background: active ? 'rgba(139,92,246,0.12)' : 'transparent',
                   textDecoration: 'none',
                 }}
