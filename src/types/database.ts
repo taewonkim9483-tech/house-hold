@@ -15,18 +15,23 @@ export interface Database {
       users: {
         Row: {
           id: string;
-          display_name: string;
+          email?: string;
+          display_name: string | null;
+          avatar_url: string | null;
           lang: 'ko' | 'ja';
           created_at: string;
         };
         Insert: {
           id?: string;
-          display_name: string;
+          email?: string;
+          display_name?: string | null;
+          avatar_url?: string | null;
           lang?: 'ko' | 'ja';
           created_at?: string;
         };
         Update: {
-          display_name?: string;
+          display_name?: string | null;
+          avatar_url?: string | null;
           lang?: 'ko' | 'ja';
         };
         Relationships: [];

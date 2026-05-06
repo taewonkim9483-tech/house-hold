@@ -66,7 +66,7 @@ export async function GET(request: Request) {
     ? await supabase.from('users').select('id, display_name').in('id', uploaderIds)
     : { data: [] };
   const nameMap = Object.fromEntries(
-    (profiles ?? []).map((u: { id: string; display_name: string }) => [u.id, u.display_name])
+    (profiles ?? []).map((u: { id: string; display_name: string | null }) => [u.id, u.display_name ?? ''])
   );
 
   // 상품 수 조회

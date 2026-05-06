@@ -14,6 +14,14 @@ const blur = 'blur(40px) saturate(180%)';
 
 const MENU_ITEMS = [
   {
+    icon: '👤',
+    ko: '프로필 설정',
+    ja: 'プロフィール設定',
+    href: '/settings/profile',
+    descKo: '이름 · 프로필 사진',
+    descJa: '名前・プロフィール写真',
+  },
+  {
     icon: '🌐',
     ko: '언어 설정',
     ja: '言語設定',
