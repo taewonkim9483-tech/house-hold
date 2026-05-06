@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import ScopeSelector from '@/components/features/scope/ScopeSelector';
 
 interface BudgetWeek {
   id: string;
@@ -129,8 +130,16 @@ export default function BudgetClient({ weeklyAmount, weeks, current, locale }: B
 
   return (
     <div>
+      {/* 헤더 */}
+      <div style={{ padding:'52px 20px 10px', color:'rgba(40,40,55,0.88)', fontSize:20, fontWeight:700 }}>
+        {locale === 'ja' ? '予算管理' : '예산 관리'}
+      </div>
+
+      {/* 범위 선택 */}
+      <ScopeSelector />
+
       {/* Tabs */}
-      <div style={{ display:'flex', margin:'52px 16px 14px', background:'rgba(255,255,255,0.5)', border:'1px solid rgba(255,255,255,0.85)', borderRadius:14, padding:3, boxShadow:'0 2px 8px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,1)' }}>
+      <div style={{ display:'flex', margin:'0 16px 14px', background:'rgba(255,255,255,0.5)', border:'1px solid rgba(255,255,255,0.85)', borderRadius:14, padding:3, boxShadow:'0 2px 8px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,1)' }}>
         {(['setting', 'closing'] as const).map((t) => (
           <button
             key={t}

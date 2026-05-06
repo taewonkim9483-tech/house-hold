@@ -21,10 +21,13 @@ interface ItemRow {
   categories: { id: string; name_ko: string; name_ja: string; icon: string } | null;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(request.url);
+  const scope = searchParams.get('scope'); // 'personal' | null
 
   const { data: member } = await supabase
     .from('group_members')
@@ -35,6 +38,7 @@ export async function GET() {
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
   const groupId: string = member.group_id;
+  const isPersonal = scope === 'personal';
   const { start, end } = getWeekRange(new Date());
 
   // 주간 예산: budgets → budget_weeks 조인
@@ -61,12 +65,17 @@ export async function GET() {
   }
 
   // 이번 주 영수증 집계 (카테고리별)
-  const { data: weekReceipts } = await supabase
+  let weekReceiptsQuery = supabase
     .from('receipts')
     .select('id, total_amount')
-    .eq('group_id', groupId)
     .gte('purchased_at', start)
     .lte('purchased_at', end + 'T23:59:59');
+  if (isPersonal) {
+    weekReceiptsQuery = weekReceiptsQuery.eq('uploaded_by', user.id);
+  } else {
+    weekReceiptsQuery = weekReceiptsQuery.eq('group_id', groupId);
+  }
+  const { data: weekReceipts } = await weekReceiptsQuery;
 
   const receiptIds = (weekReceipts ?? []).map((r) => (r as { id: string }).id);
 
@@ -115,12 +124,17 @@ export async function GET() {
   }
 
   // 최근 영수증 5건
-  const { data: recentRaw } = await supabase
+  let recentQuery = supabase
     .from('receipts')
     .select('id, store_name, purchased_at, total_amount, uploaded_by')
-    .eq('group_id', groupId)
     .order('purchased_at', { ascending: false })
     .limit(5);
+  if (isPersonal) {
+    recentQuery = recentQuery.eq('uploaded_by', user.id);
+  } else {
+    recentQuery = recentQuery.eq('group_id', groupId);
+  }
+  const { data: recentRaw } = await recentQuery;
 
   const uploaderIds = [...new Set((recentRaw ?? []).map((r) => (r as { uploaded_by: string }).uploaded_by))];
   const { data: uploaderProfiles } = uploaderIds.length > 0

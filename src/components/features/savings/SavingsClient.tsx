@@ -1,5 +1,7 @@
 'use client';
 
+import ScopeSelector from '@/components/features/scope/ScopeSelector';
+
 interface SavingsLog {
   amount: number;
   reason: string;
@@ -48,8 +50,16 @@ function reasonLabel(reason: string, locale: string): string {
 export default function SavingsClient({ totalAmount, logs, locale }: SavingsClientProps) {
   return (
     <div>
+      {/* 헤더 */}
+      <div style={{ padding:'52px 20px 10px', color:'rgba(40,40,55,0.88)', fontSize:20, fontWeight:700 }}>
+        {locale === 'ja' ? '積立プール' : '적금 풀'}
+      </div>
+
+      {/* 범위 선택 */}
+      <ScopeSelector />
+
       {/* Hero 카드 */}
-      <div style={{ margin: '52px 16px 16px', padding: 28, position: 'relative', overflow: 'hidden', background: 'rgba(255,255,255,0.58)', backdropFilter: 'blur(40px) saturate(200%)', WebkitBackdropFilter: 'blur(40px) saturate(200%)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: 28, boxShadow: '0 16px 48px rgba(134,239,172,0.14),0 4px 12px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,1)', animation: 'up .6s cubic-bezier(.34,1.4,.64,1) both' }}>
+      <div style={{ margin: '0 16px 16px', padding: 28, position: 'relative', overflow: 'hidden', background: 'rgba(255,255,255,0.58)', backdropFilter: 'blur(40px) saturate(200%)', WebkitBackdropFilter: 'blur(40px) saturate(200%)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: 28, boxShadow: '0 16px 48px rgba(134,239,172,0.14),0 4px 12px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,1)', animation: 'up .6s cubic-bezier(.34,1.4,.64,1) both' }}>
         <div style={{ position: 'absolute', top: -50, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle,rgba(134,239,172,0.22) 0%,transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ color: 'rgba(5,100,60,0.65)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 6 }}>
           {locale === 'ja' ? '積立プール' : '적금 풀'}

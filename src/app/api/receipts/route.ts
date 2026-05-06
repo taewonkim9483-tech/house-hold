@@ -13,15 +13,8 @@ export async function GET(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { data: member } = await supabase
-    .from('group_members')
-    .select('group_id')
-    .eq('user_id', user.id)
-    .single();
-  if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
-
-  const groupId: string = member.group_id;
   const { searchParams } = new URL(request.url);
+  const scope = searchParams.get('scope'); // 'personal' | null
   const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
   const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? '20')));
   const categoryId = searchParams.get('category_id');
@@ -32,8 +25,19 @@ export async function GET(request: Request) {
   let query = supabase
     .from('receipts')
     .select('id, store_name, purchased_at, total_amount, uploaded_by, created_at', { count: 'exact' })
-    .eq('group_id', groupId)
     .order('purchased_at', { ascending: false });
+
+  if (scope === 'personal') {
+    query = query.eq('uploaded_by', user.id);
+  } else {
+    const { data: member } = await supabase
+      .from('group_members')
+      .select('group_id')
+      .eq('user_id', user.id)
+      .single();
+    if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
+    query = query.eq('group_id', member.group_id);
+  }
 
   if (userId) query = query.eq('uploaded_by', userId);
   if (dateFrom) query = query.gte('purchased_at', dateFrom);

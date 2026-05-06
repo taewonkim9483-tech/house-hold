@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import ScopeProvider from '@/components/features/scope/ScopeProvider';
 
 export default async function MainLayout({
   children,
@@ -16,5 +17,5 @@ export default async function MainLayout({
     redirect(`/${locale}/login`);
   }
 
-  return <>{children}</>;
+  return <ScopeProvider>{children}</ScopeProvider>;
 }

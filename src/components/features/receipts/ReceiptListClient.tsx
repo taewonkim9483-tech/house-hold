@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ScopeSelector from '@/components/features/scope/ScopeSelector';
+import { useScopeStore } from '@/hooks/useScopeStore';
 
 interface ReceiptRow {
   id: string;
@@ -78,6 +80,7 @@ function getStoreIcon(name: string): string {
 export default function ReceiptListClient({ locale, categories, members }: Props) {
   const router = useRouter();
   const isJa = locale === 'ja';
+  const { scope } = useScopeStore();
 
   const [period, setPeriod] = useState<Period>('week');
   const [categoryId, setCategoryId] = useState('');
@@ -97,6 +100,9 @@ export default function ReceiptListClient({ locale, categories, members }: Props
     async function fetch_() {
       setLoading(true);
       const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) });
+      if (scope.type === 'personal') {
+        params.set('scope', 'personal');
+      }
       if (categoryId) params.set('category_id', categoryId);
       if (memberId) params.set('user_id', memberId);
       if (period === 'week') {
@@ -121,7 +127,7 @@ export default function ReceiptListClient({ locale, categories, members }: Props
     }
     fetch_();
     return () => { cancelled = true; };
-  }, [page, period, categoryId, memberId, customFrom, customTo]);
+  }, [page, period, categoryId, memberId, customFrom, customTo, scope]);
 
   function changeFilter(fn: () => void) {
     fn();
@@ -160,6 +166,9 @@ export default function ReceiptListClient({ locale, categories, members }: Props
           {isJa ? '+ 登録' : '+ 등록'}
         </button>
       </div>
+
+      {/* 범위 선택 */}
+      <ScopeSelector />
 
       {/* 필터 영역 */}
       <div
