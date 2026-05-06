@@ -54,7 +54,8 @@ export async function POST(request: Request) {
     .from('group_members')
     .select('group_id')
     .eq('user_id', user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
 
   if (!memberRow) return NextResponse.json({ error: 'No group' }, { status: 403 });
   const groupId = memberRow.group_id as string;

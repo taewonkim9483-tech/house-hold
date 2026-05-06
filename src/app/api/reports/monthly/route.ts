@@ -32,7 +32,8 @@ export async function GET(request: Request) {
     .from('group_members')
     .select('group_id')
     .eq('user_id', user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
   const groupId: string = member.group_id;

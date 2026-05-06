@@ -24,7 +24,8 @@ export async function GET() {
     .from('group_members')
     .select('group_id')
     .eq('user_id', user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
   const { data: budget } = await supabase

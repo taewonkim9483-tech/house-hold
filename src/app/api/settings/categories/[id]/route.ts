@@ -11,7 +11,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     .from('group_members')
     .select('group_id')
     .eq('user_id', user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
   const { data: category } = await supabase

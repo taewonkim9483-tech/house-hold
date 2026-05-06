@@ -34,7 +34,8 @@ export async function GET(request: Request) {
       .from('group_members')
       .select('group_id')
       .eq('user_id', user.id)
-      .single();
+      .limit(1)
+      .maybeSingle();
     if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
     query = query.eq('group_id', member.group_id);
   }
@@ -121,7 +122,8 @@ export async function POST(request: Request) {
     .from('group_members')
     .select('group_id')
     .eq('user_id', user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
 
   if (!member) return NextResponse.json({ error: 'Not a group member' }, { status: 403 });
 
