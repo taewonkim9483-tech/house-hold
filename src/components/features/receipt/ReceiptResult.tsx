@@ -21,11 +21,12 @@ interface Props {
 export default function ReceiptResult({ analyzed, imageBase64, imageMimeType, locale }: Props) {
   const router = useRouter();
   const [items, setItems] = useState<AnalyzedItem[]>(analyzed.items);
+  const [totalAmount, setTotalAmount] = useState<number>(analyzed.totalAmount);
+  const [editingTotal, setEditingTotal] = useState(false);
+  const [totalInput, setTotalInput] = useState<string>(String(analyzed.totalAmount));
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const totalAmount = items.reduce((s, i) => s + i.subtotal, 0);
 
   const handleSave = async () => {
     setSaving(true);
@@ -82,11 +83,42 @@ export default function ReceiptResult({ analyzed, imageBase64, imageMimeType, lo
         <div style={{ color: 'rgba(40,40,55,0.88)', fontSize: 20, fontWeight: 700 }}>{analyzed.storeName}</div>
         <div style={{ color: 'rgba(80,80,110,0.58)', fontSize: 13, marginTop: 4 }}>{dateStr}</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 16, paddingTop: 14, borderTop: '0.5px solid rgba(0,0,0,0.07)' }}>
-          <div style={{ color: 'rgba(80,80,110,0.58)', fontSize: 13 }}>합계</div>
           <div>
-            <div style={{ color: 'rgba(40,40,55,0.88)', fontSize: 26, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>¥{totalAmount.toLocaleString()}</div>
+            <div style={{ color: 'rgba(80,80,110,0.58)', fontSize: 13 }}>최종 결제금액</div>
+            <div style={{ color: 'rgba(120,120,150,0.38)', fontSize: 11, marginTop: 2 }}>탭하여 수정</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            {editingTotal ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: 'rgba(40,40,55,0.88)', fontSize: 22, fontWeight: 700 }}>¥</span>
+                <input
+                  type="number"
+                  value={totalInput}
+                  onChange={(e) => setTotalInput(e.target.value)}
+                  onBlur={() => {
+                    const val = parseInt(totalInput, 10);
+                    if (!isNaN(val) && val >= 0) setTotalAmount(val);
+                    else setTotalInput(String(totalAmount));
+                    setEditingTotal(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                    if (e.key === 'Escape') { setTotalInput(String(totalAmount)); setEditingTotal(false); }
+                  }}
+                  autoFocus
+                  style={{ width: 120, fontSize: 22, fontWeight: 700, textAlign: 'right', border: '1px solid rgba(139,92,246,0.4)', borderRadius: 8, padding: '2px 6px', outline: 'none', background: 'rgba(255,255,255,0.7)', color: 'rgba(40,40,55,0.88)', fontVariantNumeric: 'tabular-nums' }}
+                />
+              </div>
+            ) : (
+              <div
+                onClick={() => { setTotalInput(String(totalAmount)); setEditingTotal(true); }}
+                style={{ color: 'rgba(40,40,55,0.88)', fontSize: 26, fontWeight: 700, fontVariantNumeric: 'tabular-nums', cursor: 'pointer' }}
+              >
+                ¥{totalAmount.toLocaleString()}
+              </div>
+            )}
             {analyzed.taxAmount && (
-              <div style={{ color: 'rgba(120,120,150,0.38)', fontSize: 11, marginTop: 2, textAlign: 'right' }}>소비세 포함 ¥{analyzed.taxAmount.toLocaleString()}</div>
+              <div style={{ color: 'rgba(120,120,150,0.38)', fontSize: 11, marginTop: 2 }}>소비세 포함 ¥{analyzed.taxAmount.toLocaleString()}</div>
             )}
           </div>
         </div>

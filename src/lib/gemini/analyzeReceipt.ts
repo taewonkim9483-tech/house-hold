@@ -4,8 +4,7 @@ import { AnalyzedReceipt } from '@/types/domain';
 // 우선순위 순서로 시도할 모델 목록
 const MODELS = ['gemini-2.0-flash-001', 'gemini-2.5-flash', 'gemini-flash-latest'];
 
-const PROMPT = `Analyze this Japanese receipt image and extract all information.
-Also classify each item and assign tags for price comparison.
+const PROMPT = `Analyze this Japanese receipt image and extract the following information.
 
 Respond ONLY with this JSON structure:
 {
@@ -30,6 +29,8 @@ Respond ONLY with this JSON structure:
 }
 
 Rules:
+- total_amount: READ DIRECTLY from the receipt's final payment line (お支払金額, 合計, 請求金額, etc.). Do NOT calculate from items. This is the actual amount the customer paid after all discounts and coupons.
+- items: Include ONLY actual purchased products. DO NOT include discount lines, coupon deductions, points, fees, or any non-product lines. The sum of item subtotals may differ from total_amount due to discounts/coupons — this is expected.
 - unit_type: use per_100g for meat/fish, per_100ml for beverages, per_count otherwise
 - price_per_100: calculate if weight_g or volume_ml is available
 - tags: use Japanese, 2-4 tags per item (product type, brand hint, size hint)
