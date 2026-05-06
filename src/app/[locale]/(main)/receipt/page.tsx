@@ -17,7 +17,8 @@ export default async function ReceiptPage({
     .from('group_members')
     .select('group_id')
     .eq('user_id', user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
 
   if (!member) redirect(`/${locale}/group`);
 
