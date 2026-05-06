@@ -20,7 +20,7 @@ export default function WeeklyBudgetCard({ week, locale }: { week: WeekData; loc
   const isOver = pct >= 100;
 
   const weekLabel = locale === 'ja'
-    ? `${formatDate(week.start)} – ${formatDate(week.end)} 週`
+    ? `${week.start == '' ? '--' : formatDate(week.start)} – ${week.end == '' ? '--' : formatDate(week.end)} 週`
     : `이번 주 · ${formatDate(week.start)} – ${formatDate(week.end)}`;
 
   const labelRemaining = locale === 'ja' ? '今週の残高' : '이번 주 잔액';
