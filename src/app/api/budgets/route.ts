@@ -36,14 +36,48 @@ export async function GET() {
 
   if (!budget) return NextResponse.json({ budget: null, weeks: [] });
 
-  const { data: weeks } = await supabase
+  // 현재 주 행이 없으면 자동 생성
+  const { weekStart, weekEnd } = getWeekRange(new Date());
+  const { data: currentWeekRow } = await supabase
+    .from('budget_weeks')
+    .select('id')
+    .eq('budget_id', budget.id)
+    .eq('week_start', weekStart)
+    .maybeSingle();
+
+  if (!currentWeekRow) {
+    await supabase.from('budget_weeks').insert({
+      budget_id: budget.id,
+      week_start: weekStart,
+      week_end: weekEnd,
+      base_amount: budget.weekly_amount,
+    });
+  }
+
+  const { data: weeksRaw } = await supabase
     .from('budget_weeks')
     .select('id, week_start, week_end, base_amount, spent_amount, status')
     .eq('budget_id', budget.id)
     .order('week_start', { ascending: false })
     .limit(8);
 
-  return NextResponse.json({ budget, weeks: weeks ?? [] });
+  // open/pending_close 주는 실제 영수증 합산으로 spent_amount 재계산
+  const weeks = await Promise.all(
+    (weeksRaw ?? []).map(async (w) => {
+      const isOpen = w.status === 'open' || w.status === 'pending_close';
+      if (!isOpen) return w;
+      const { data: receipts } = await supabase
+        .from('receipts')
+        .select('total_amount')
+        .eq('group_id', member.group_id)
+        .gte('purchased_at', w.week_start)
+        .lte('purchased_at', w.week_end + 'T23:59:59');
+      const spent_amount = (receipts ?? []).reduce((s, r) => s + r.total_amount, 0);
+      return { ...w, spent_amount };
+    })
+  );
+
+  return NextResponse.json({ budget, weeks });
 }
 
 export async function POST(request: Request) {

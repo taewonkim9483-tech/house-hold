@@ -44,28 +44,26 @@ export async function GET() {
     .eq('week_start', weekStart)
     .maybeSingle();
 
-  if (!week) {
-    return NextResponse.json({
-      week_id: null,
-      week_start: weekStart,
-      week_end: weekEnd,
-      base_amount: budget.weekly_amount,
-      spent_amount: 0,
-      remaining: budget.weekly_amount,
-      is_over: false,
-      status: 'open',
-    });
-  }
+  // 실제 영수증 합산으로 spent_amount 계산 (budget_weeks 동기화 오류 방지)
+  const { data: receipts } = await supabase
+    .from('receipts')
+    .select('total_amount')
+    .eq('group_id', member.group_id)
+    .gte('purchased_at', weekStart)
+    .lte('purchased_at', weekEnd + 'T23:59:59');
+  const spent_amount = (receipts ?? []).reduce((s, r) => s + r.total_amount, 0);
 
-  const remaining = week.base_amount - week.spent_amount;
+  const base_amount = week?.base_amount ?? budget.weekly_amount;
+  const remaining = base_amount - spent_amount;
+
   return NextResponse.json({
-    week_id: week.id,
-    week_start: week.week_start,
-    week_end: week.week_end,
-    base_amount: week.base_amount,
-    spent_amount: week.spent_amount,
+    week_id: week?.id ?? null,
+    week_start: weekStart,
+    week_end: weekEnd,
+    base_amount,
+    spent_amount,
     remaining,
     is_over: remaining < 0,
-    status: week.status,
+    status: week?.status ?? 'open',
   });
 }
