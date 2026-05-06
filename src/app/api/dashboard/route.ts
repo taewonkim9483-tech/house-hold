@@ -44,30 +44,7 @@ export async function GET(request: Request) {
   const isPersonal = scope === 'personal';
   const { start, end } = getWeekRange(new Date());
 
-  // 주간 예산: budgets → budget_weeks 조인
-  const { data: budgetRow } = await supabase
-    .from('budgets')
-    .select('id, weekly_amount')
-    .eq('group_id', groupId)
-    .maybeSingle();
-
-  let budget = 0;
-  let spent = 0;
-
-  if (budgetRow) {
-    const { data: weekRow } = await supabase
-      .from('budget_weeks')
-      .select('base_amount, spent_amount')
-      .eq('budget_id', budgetRow.id)
-      .gte('week_start', start)
-      .lte('week_end', end)
-      .maybeSingle();
-
-    budget = weekRow?.base_amount ?? budgetRow.weekly_amount;
-    spent = weekRow?.spent_amount ?? 0;
-  }
-
-  // 이번 주 영수증 집계 (카테고리별)
+  // 이번 주 영수증 (spent 계산 + 카테고리 집계에 공통 사용)
   let weekReceiptsQuery = supabase
     .from('receipts')
     .select('id, total_amount')
@@ -79,6 +56,30 @@ export async function GET(request: Request) {
     weekReceiptsQuery = weekReceiptsQuery.eq('group_id', groupId);
   }
   const { data: weekReceipts } = await weekReceiptsQuery;
+
+  // spent: 실제 영수증 합산 (budget_weeks.spent_amount 미사용 — 동기화 오류 방지)
+  const spent = (weekReceipts ?? []).reduce(
+    (sum, r) => sum + (r as { total_amount: number }).total_amount, 0
+  );
+
+  // 주간 예산: budget 금액만 조회
+  const { data: budgetRow } = await supabase
+    .from('budgets')
+    .select('id, weekly_amount')
+    .eq('group_id', groupId)
+    .maybeSingle();
+
+  let budget = 0;
+  if (budgetRow) {
+    const { data: weekRow } = await supabase
+      .from('budget_weeks')
+      .select('base_amount')
+      .eq('budget_id', budgetRow.id)
+      .lte('week_start', start)
+      .gte('week_end', end)
+      .maybeSingle();
+    budget = weekRow?.base_amount ?? budgetRow.weekly_amount;
+  }
 
   const receiptIds = (weekReceipts ?? []).map((r) => (r as { id: string }).id);
 
@@ -99,9 +100,6 @@ export async function GET(request: Request) {
 
     const items = (itemsRaw ?? []) as unknown as ItemRow[];
     const catMap = new Map<string, { name_ko: string; name_ja: string; icon: string; amount: number }>();
-    const totalSpent = (weekReceipts ?? []).reduce(
-      (sum, r) => sum + (r as { total_amount: number }).total_amount, 0
-    );
 
     for (const item of items) {
       const cat = item.categories;
@@ -120,7 +118,7 @@ export async function GET(request: Request) {
       .map(([cat_id, v]) => ({
         category_id: cat_id,
         ...v,
-        ratio: totalSpent > 0 ? Math.round((v.amount / totalSpent) * 100) : 0,
+        ratio: spent > 0 ? Math.round((v.amount / spent) * 100) : 0,
       }))
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5);
